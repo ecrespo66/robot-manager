@@ -2,13 +2,12 @@ import asyncio
 import base64
 import os
 from pathlib import Path
-
 import requests
-from assets import Asset
-from flow import RobotFlow
-from logs import Log
-from queues import Queue
-from server import OrchestratorAPI
+from .assets import Asset
+from .flow import RobotFlow
+from .logs import Log
+from .queues import Queue
+from .server import OrchestratorAPI
 
 
 class Bot(object):

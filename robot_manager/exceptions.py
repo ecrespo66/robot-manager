@@ -1,6 +1,6 @@
 import inspect
 import traceback
-from flow import RobotFlow
+from .flow import RobotFlow
 
 
 class RobotBaseException(Exception):

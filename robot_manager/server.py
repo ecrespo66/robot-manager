@@ -1,11 +1,11 @@
 import datetime
-import json
 import os
 import string
 import warnings
 from pathlib import Path
 from random import random
 import requests
+from decouple import config
 
 
 class OrchestratorAPI:
@@ -32,23 +32,32 @@ class OrchestratorAPI:
         Returns:
              True if the connection is working, False otherwise.
         """
-        if self.username is None:
+        if self.token is None:
             self.debug = True
-            folder = Path(os.path.dirname(os.path.realpath(__file__))).parent.parent
-            debug_file = os.path.join(folder, 'debug.json')
-            try:
-                with open(debug_file, 'r') as f:
-                    self.debug_data = json.load(f)
-
-                self.username = self.debug_data["IBOTT_USERNAME"]
-                self.password = self.debug_data["IBOTT_PASSWORD"]
-                self.url = self.debug_data['URL']
-                self.robot_id = self.debug_data['ROBOT_ID']
-                warnings.warn(
-                    f"Using debug file:{debug_file} to connect to the orchestrator, please check the variables in debug.json ")
-            except:
-                warnings.warn("No username or password provided.Please Set them in debug.json")
-                return False
+            if config('IBOTT_URL', default=None) is None:
+                folder = Path(os.path.dirname(os.path.realpath(__file__))).parent
+                env_file = os.path.join(folder, '.env')
+                with open(env_file, 'a') as f:
+                    IBOTT_URL = str(input("Write iBott Console url: "))
+                    f.write(f"IBOTT_URL = \"{IBOTT_URL}\"")
+                f.close()
+                self.url = IBOTT_URL
+            else:
+                self.url = config('IBOTT_URL', default=None)
+            if config('IBOTT_TOKEN', default=None) is None:
+                folder = Path(os.path.dirname(os.path.realpath(__file__))).parent
+                env_file = os.path.join(folder, '.env')
+                with open(env_file, 'a') as f:
+                    IBOTT_TOKEN = str(input("Write iBott Console token: "))
+                    f.write("\n")
+                    f.write(f"IBOTT_TOKEN = \"{IBOTT_TOKEN}\"")
+                f.close()
+                self.token = IBOTT_TOKEN
+            else:
+                self.token = config('IBOTT_TOKEN', default=None)
+            self.robot_id = str(input("Write RobotId: "))
+            warnings.warn(
+                f"Using enviroment variables to connect to the orchestrator")
         return True
 
     def __get_protocol(self):
@@ -126,8 +135,7 @@ class OrchestratorAPI:
                 'RobotId': None,
                 'ExecutionId': None,
                 'url': None,
-                'username': None,
-                'password': None,
+                'token': None,
                 'params': None
             }
         return args
