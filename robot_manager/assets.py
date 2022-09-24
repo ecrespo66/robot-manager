@@ -3,7 +3,7 @@ import requests
 
 class Asset(object):
     """
-    Class to represent get assets from the robot manager console.
+    Class to get assets from the robot manager console.
     Arguments:
         connection (object): Connection object to the robot manager console.
         id (string): Asset ID.
@@ -70,10 +70,10 @@ class Asset(object):
             raise Exception(exception_message)
 
         asset = response.json()[0]
-        self.id = asset['credential_id']
-        self.name = asset['credential_name']
-        self.type = asset['credential_type']
-        if asset['credential_type'] == "Credential":
+        self.id = asset['asset_id']
+        self.name = asset['asset_name']
+        self.type = asset['asset_type']
+        if asset['asset_type'] == "Credential":
             self.username = asset['data_1']
             self.password = asset['data_2']
         else:

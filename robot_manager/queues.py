@@ -42,11 +42,13 @@ class Queue(object):
             data = {
                 'QueueName': self.queue_name
                 }
-            requests.post(end_point, data, headers=self.connection.headers)
-
+            response = requests.post(end_point, data, headers=self.connection.headers)
+            self.queue_id = response.json()['QueueId']
         else:
-            end_point = f'{self.connection.http_protocol}{self.connection.url}/api/queues/?QueueId={self.queue_id}/'
+            end_point = f'{self.connection.http_protocol}{self.connection.url}/api/queues/?QueueId={self.queue_id}'
             response = requests.get(end_point, headers=self.connection.headers)
+            if response.status_code != 200:
+                raise Exception(response.json())
             self.queue_name = response.json()[0]['QueueName']
 
     def __getItem(self):
@@ -57,11 +59,14 @@ class Queue(object):
         """
         endpoint = f'{self.connection.http_protocol}{self.connection.url}/api/items/?QueueId={self.queue_id}&Status=pending'
         try:
-            queue_items = requests.get(endpoint, headers=self.connection.headers).json()
+            response = requests.get(endpoint, headers=self.connection.headers)
+            if response.status_code != 200:
+                raise Exception(response.json())
+            queue_items = response.json()
         except Exception as exception_message:
             raise Exception(exception_message)
         for item in queue_items:
-            item = Item(connection=self.connection, queue_id=self.queue_id, item_id=item['ItemId'])
+            item = Item(connection=self.connection, queue_id=self.queue_id, item_id=item['ItemId'],item_data=item['Data'])
             if item.status == 'fail' and item.item_executions < self.__retry_times:
                 item.set_item_executions()
                 item.set_item_as_pending()

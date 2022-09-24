@@ -55,7 +55,6 @@ class OrchestratorAPI:
                 self.token = IBOTT_TOKEN
             else:
                 self.token = config('IBOTT_TOKEN', default=None)
-            self.robot_id = str(input("Write RobotId: "))
             warnings.warn(
                 f"Using enviroment variables to connect to the orchestrator")
         return True
@@ -87,10 +86,14 @@ class OrchestratorAPI:
             url: str
         """
         if "https://" in self.url:
-            return self.url.replace("https://", "")
-        return self.url.replace("http://", "")
+            self.url = self.url.replace("https://", "")
+        else:
+            self.url = self.url.replace("http://", "")
+        if self.url[-1] == "/":
+            self.url = self.url[:-1]
+        return self.url
 
-    async def send_message(self, message, log_type='log'):
+    def send_message(self, message, log_type='log'):
         """
         Async method used to send a message to the orchestrator.
         Arguments:

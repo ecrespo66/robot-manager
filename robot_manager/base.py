@@ -39,6 +39,8 @@ class Bot(object):
         self.robot_id = kwargs.get('RobotId', None)
         self.execution_id = kwargs.get('ExecutionId', None)
         self.log = Log(self.connection)
+        if not self.robot_id:
+            self.robot_id = str(input("Write RobotId: "))
         self.queue = None
         RobotFlow.connect_nodes()
 
@@ -62,7 +64,7 @@ class Bot(object):
             Queue object: The Queue where items are stored in
 
         """
-        queue = Queue(self.connection, robot_id=self.robot_id, queue_id=queue_id)
+        queue = Queue(connection=self.connection, robot_id=self.robot_id, queue_id=queue_id)
         return queue
 
     def find_queues_by_name(self, queue_name: str):
@@ -105,7 +107,7 @@ class Bot(object):
         return Asset(connection=self.connection, asset_id=asset_id)
 
     @staticmethod
-    def save_file_from_orchestrator(string, folder=None):
+    def save_file_from_console(string, folder=None):
         """
         This method is used to save a file sent to the robot execution from the orchestrator console.
         Arguments:
@@ -124,13 +126,4 @@ class Bot(object):
         f.close()
         return os.path.join(folder, filename)
 
-    def finish_execution(self):
-        """
-        This method is used to finish the execution of the robot.
-        Returns:
-            None
-        """
-        try:
-            asyncio.run(self.connection.send_message("[Execution Over]"))
-        except:
-            raise self.log.info("Orchestrator is not connected")
+

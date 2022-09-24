@@ -39,7 +39,7 @@ class Log:
             None
         """
         log_type = 'trace'
-        asyncio.run(self.send(log, log_type=log_type))
+        self.send(log, log_type=log_type)
 
     def info(self, log: str):
         """
@@ -50,7 +50,7 @@ class Log:
             None
         """
         log_type = 'info'
-        asyncio.run(self.send(log, log_type=log_type))
+        self.send(log, log_type=log_type)
 
     def system_exception(self, error: str):
         """
@@ -59,7 +59,7 @@ class Log:
             error: The error message.
         """
         log_type = 'systemException'
-        asyncio.run(self.send(error, log_type=log_type))
+        self.send(error, log_type=log_type)
 
     def business_exception(self, error: str):
         """
@@ -68,9 +68,9 @@ class Log:
             error: The error message.
         """
         log_type = 'businessException'
-        asyncio.run(self.send(error, log_type=log_type))
+        self.send(error, log_type=log_type)
 
-    async def send(self, log: str, log_type: str):
+    def send(self, log: str, log_type: str):
         """
         Async function to send logs to orchestrator
         Arguments:
@@ -81,7 +81,7 @@ class Log:
         """
         if not self.connection.debug:
             try:
-                await self.connection.send_message(log, log_type=log_type)
+                self.connection.send_message(log, log_type=log_type)
             except:
                 raise Exception("Orchestrator is not connected")
         else:

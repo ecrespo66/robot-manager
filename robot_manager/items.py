@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import json
 import requests
 
 
@@ -27,7 +27,6 @@ class Item(object):
         set_item_as_working(self): Set item as working.
         set_item_as_ok(self): Set item as ok.
         set_item_as_fail(self): Set item as failed.
-        set_item_as_warn(self): Set item as warning.
         set_item_as_pending(self): Set item as pending.
         set_item_executions(self): increment item execution counter
 
@@ -48,10 +47,12 @@ class Item(object):
 
     def __set_item_status(self, data):
         """Set item status"""
-        endpoint = f'{self.connection.ws_protocol}{self.connection.url}/api/items/{self.item_id}/set_item/'
+        endpoint = f'{self.connection.http_protocol}{self.connection.url}/api/items/{self.item_id}/set_item/'
 
         try:
-            requests.put(endpoint, data, headers=self.connection.headers)
+            response = requests.put(endpoint, data, headers=self.connection.headers)
+            if response.status_code != 200:
+                raise Exception(response.json())
         except Exception as exception_message:
             raise Exception(exception_message)
 
@@ -79,7 +80,7 @@ class Item(object):
         """Set Item status as Pending"""
         self.status = 'pending'
         data = {"Status": self.status}
-        self.__set_item_status()
+        self.__set_item_status(data)
 
     def set_item_executions(self):
         """Set number of executions"""
@@ -99,23 +100,25 @@ class Item(object):
     def __post_item(self):
         """Post new item"""
 
-        endpoint = f'{self.connection.ws_protocol}{self.connection.url}/queue/{self.queue_id}/add_item/'
-        item = {
-                'Data': json.dumps(self.item_data)
-               }
+        endpoint = f'{self.connection.http_protocol}{self.connection.url}/api/queues/{self.queue_id}/add_item/'
+        item =  {"Data":json.dumps(self.item_data)}
         try:
             response = requests.post(endpoint, item, headers=self.connection.headers)
-            self.item_id = response["ItemId"]
-
+            if response.status_code != 200:
+                raise Exception(response.json())
+            self.item_id = response.json()["ItemId"]
         except Exception as exception_message:
             raise Exception(exception_message)
 
     def __get_item(self):
         """Get item data"""
         try:
-            endpoint = f'{self.connection.ws_protocol}{self.connection.url}/api/items/?ItemId={self.item_id}'
-            item = requests.get(endpoint, headers=self.connection.headers).json()
-            self.data = eval(item['Data'])
+            endpoint = f'{self.connection.http_protocol}{self.connection.url}/api/items/?ItemId={self.item_id}'
+            response = requests.get(endpoint, headers=self.connection.headers)
+            if response.status_code != 200:
+                raise Exception(response.json())
+            item = response.json()[0]
+            self.data = item['Data']
             self.status = item['Status']
         except Exception as exception_message:
             raise Exception(exception_message)
