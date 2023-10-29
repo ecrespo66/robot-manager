@@ -35,13 +35,16 @@ class Bot(object):
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
-        self.connection = OrchestratorAPI(**self.kwargs)
-        self.robot_id = kwargs.get('RobotId', None)
-        self.execution_id = kwargs.get('ExecutionId', None)
-        self.log = Log(self.connection)
-        if not self.robot_id:
-            self.robot_id = str(input("Write RobotId: "))
-        self.queue = None
+        disabled = kwargs.get('disabled', True)
+        if disabled == False:
+            self.connection = OrchestratorAPI(**self.kwargs)
+            self.robot_id = kwargs.get('RobotId', None)
+            self.execution_id = kwargs.get('ExecutionId', None)
+            self.parameters = kwargs.get('params', None)
+            self.log = Log(self.connection)
+            if not self.robot_id:
+                self.robot_id = str(input("Write RobotId: "))
+            self.queue = None
         RobotFlow.connect_nodes()
 
     def create_queue(self, queue_name: str):
@@ -121,7 +124,7 @@ class Bot(object):
         base = string.split(",")[-1]
         filename = string.split(",")[0]
         file = base64.b64decode(base)
-        f = open(os.path.join(folder.path, filename), "wb")
+        f = open(os.path.join(folder, filename), "wb")
         f.write(file)
         f.close()
         return os.path.join(folder, filename)

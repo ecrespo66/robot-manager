@@ -18,6 +18,7 @@ class OrchestratorAPI:
         self.url = kwargs.get('url', None)
         self.token = kwargs.get('token', None)
         self.parameters = kwargs.get('params', None)
+        self.execution_id = kwargs.get('ExecutionId', None)
         self.debug = False
         self.debug_data = None
         self.___connection = self.__check_connection()

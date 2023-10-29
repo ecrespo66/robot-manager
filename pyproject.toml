@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling", "requests","decouple"]
+requires = ["hatchling", "requests","python-decouple==3.1"]
 build-backend = "hatchling.build"
 
 [project]
 name = "ibott-robot-manager"
-version = "1.0.3"
+version = "1.0.10"
 authors = [
     { name="OnameDohe", email="enrique.crespo.debenito@gmail.com" },
 ]
