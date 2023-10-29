@@ -3,7 +3,7 @@ import os
 import string
 import warnings
 from pathlib import Path
-from random import random
+from random import *
 import requests
 from decouple import config
 
@@ -115,7 +115,7 @@ class OrchestratorAPI:
             "LogType": log_type,
             "LogData": message,
             "ExecutionId": self.execution_id,
-            "LogId": ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(64)),
+            "LogId": ''.join(choice(string.ascii_uppercase + string.digits) for _ in range(64)),
             "DateTime": datetime.datetime.now()
         }
         try:
