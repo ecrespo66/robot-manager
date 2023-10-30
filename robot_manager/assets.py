@@ -56,7 +56,7 @@ class Asset(object):
         self.id = asset['asset_id']
         self.name = asset['asset_name']
         self.type = asset['asset_type']
-        if self.type == "Credential":
+        if self.type == "credential":
             self.username = asset['data_1']
             self.password = asset['data_2']
         else:
@@ -73,7 +73,7 @@ class Asset(object):
         self.id = asset['asset_id']
         self.name = asset['asset_name']
         self.type = asset['asset_type']
-        if asset['asset_type'] == "Credential":
+        if asset['asset_type'] == "credential":
             self.username = asset['data_1']
             self.password = asset['data_2']
         else:

@@ -39,7 +39,7 @@ class Log:
         log_type = 'trace'
         self.send(log, log_type=log_type)
 
-    def info(self, log: str):
+    def log(self, log: str):
         """
         Send info trace to the robot manager console.
         Arguments:
@@ -47,7 +47,7 @@ class Log:
         Returns:
             None
         """
-        log_type = 'info'
+        log_type = 'log'
         self.send(log, log_type=log_type)
 
     def system_exception(self, error: str):
@@ -56,7 +56,7 @@ class Log:
         Arguments:
             error: The error message.
         """
-        log_type = 'systemException'
+        log_type = 'syex'
         self.send(error, log_type=log_type)
 
     def business_exception(self, error: str):
@@ -65,7 +65,7 @@ class Log:
         Arguments:
             error: The error message.
         """
-        log_type = 'businessException'
+        log_type = 'byex'
         self.send(error, log_type=log_type)
 
     def send(self, log: str, log_type: str):
