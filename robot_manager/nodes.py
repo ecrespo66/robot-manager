@@ -35,13 +35,12 @@ class RobotNode:
             flow_path = f"{str(self.position)}-->{str(next_node.position)}"
         self.node_flows.append(flow_path)
 
-    def run(self, robot, *args):
+    def get_next(self, *args):
         """
         This method is used to run the node.
         """
-        self.data = self.method(robot, *args)
-        if self.next_node:
-            self.next_node.run(robot, self.data)
+        return self.next_node
+
 
 
 class StartClass(RobotNode):
@@ -83,9 +82,9 @@ class EndClass(RobotNode):
         """
         raise ValueError("EndNode Must be at the end of the flow")
 
-    def run(self, robot, *args):
-        self.method(robot, *args)
-        robot.finish_execution()
+    def get_next(self, *args):
+        return False
+
 
 
 class OperationClass(RobotNode):
@@ -176,7 +175,7 @@ class ConditionClass(RobotNode):
             raise ValueError("Wrong module connection for ConditionClass")
         self.node_flows.append(flow_path)
 
-    def run(self, robot, *args):
+    def get_next(self, *args):
         """
         This method is used to run the conditional nodes.
         Evaluates function and execute the next node (OnTrueNode/OnFalseNode) depending on the result.
@@ -184,8 +183,8 @@ class ConditionClass(RobotNode):
         robot: type Robot -> robot object.
         *args: *optional - Defines the arguments of the current node.
         """
-        self.data = self.method(robot, *args)
+        self.data = args
         if self.condition(self.data):
-            self.on_true_node.run(robot, self.data)
+            return self.on_true_node
         else:
-            self.on_false_node.run(robot, self.data)
+            return self.on_false_node

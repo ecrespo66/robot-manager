@@ -36,16 +36,41 @@ class Bot(object):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         disabled = kwargs.get('disabled', True)
-        if disabled == False:
+        self.connection = None
+        if not disabled:
             self.connection = OrchestratorAPI(**self.kwargs)
             self.robot_id = kwargs.get('RobotId', None)
             self.execution_id = kwargs.get('ExecutionId', None)
             self.parameters = kwargs.get('params', None)
-            self.log = Log(self.connection)
             if not self.robot_id:
                 self.robot_id = str(input("Write RobotId: "))
             self.queue = None
-        RobotFlow.connect_nodes()
+        self.log = Log(self.connection)
+        self.exception = None
+        self.flow = RobotFlow.connect_nodes()
+        self.node = RobotFlow.nodes[0]
+        self.args = None
+        self.run()
+
+    def run(self):
+        while True:
+            try:
+                if self.args:
+                    self.args = self.node.method(self, *self.args)
+                else:
+                    self.args = self.node.method(self)
+
+                if self.args:
+                    self.node = self.node.get_next(*self.args)
+                else:
+                    self.node = self.node.get_next()
+            except Exception as e:
+                if self.exception:
+                    self.exception.process_exception()
+                else:
+                    raise Exception(e)
+            if not self.node:
+                break
 
     def create_queue(self, queue_name: str):
         """
@@ -58,8 +83,8 @@ class Bot(object):
         queue = Queue(connection=self.connection, robot_id=self.robot_id, queue_name=queue_name)
         return queue
 
-    def find_queue_by_id(self, queue_id: str):
-        """
+    def find_queue_y_id(self, queue_id: str):
+        """b
         This method is used to find a queue by its ID.
         Arguments:
             queue_id: The ID of the queue.
@@ -128,5 +153,3 @@ class Bot(object):
         f.write(file)
         f.close()
         return os.path.join(folder, filename)
-
-

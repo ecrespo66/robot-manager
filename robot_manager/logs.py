@@ -1,3 +1,5 @@
+import logging
+
 
 class Log:
     """
@@ -25,8 +27,12 @@ class Log:
         Returns:
             None
         """
-        log_type = 'debug'
-        self.send(log, log_type=log_type)
+
+        if self.connection:
+            log_type = 'debug'
+            self.send(log, log_type=log_type)
+        else:
+            logging.debug(log)
 
     def trace(self, log: str):
         """
@@ -36,8 +42,11 @@ class Log:
         Returns:
             None
         """
-        log_type = 'trace'
-        self.send(log, log_type=log_type)
+        if self.connection:
+            log_type = 'trace'
+            self.send(log, log_type=log_type)
+        else:
+            logging.info(log)
 
     def log(self, log: str):
         """
@@ -47,8 +56,11 @@ class Log:
         Returns:
             None
         """
-        log_type = 'log'
-        self.send(log, log_type=log_type)
+        if self.connection:
+            log_type = 'log'
+            self.send(log, log_type=log_type)
+        else:
+            logging.log(log)
 
     def system_exception(self, error: str):
         """
@@ -56,8 +68,11 @@ class Log:
         Arguments:
             error: The error message.
         """
-        log_type = 'syex'
-        self.send(error, log_type=log_type)
+        if self.connection:
+            log_type = 'syex'
+            self.send(error, log_type=log_type)
+        else:
+            logging.critical(error)
 
     def business_exception(self, error: str):
         """
@@ -65,8 +80,11 @@ class Log:
         Arguments:
             error: The error message.
         """
-        log_type = 'byex'
-        self.send(error, log_type=log_type)
+        if self.connection:
+            log_type = 'byex'
+            self.send(error, log_type=log_type)
+        else:
+            logging.exception(error)
 
     def send(self, log: str, log_type: str):
         """

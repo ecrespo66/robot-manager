@@ -19,7 +19,7 @@ class Queue(object):
     Methods:
         create_item(item_data): Create a new item in the queue.
         get_next_item(): Get the next pending item in the queue.
-        set_retry_times(times): Set the retry times of an item.
+        set_retry_times(times): Set the retry times of the items.
     """
 
     def __init__(self, **kwargs):

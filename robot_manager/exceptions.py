@@ -21,15 +21,19 @@ class RobotException(Exception):
 
     def __init__(self, *args, **kwargs):
         self.__class__.exceptions.append(self)
-        curframe = inspect.currentframe()
-        current_method_name = inspect.getouterframes(curframe, 2)[1][3]  # get the name of the caller method
+        frame= inspect.currentframe()
+        while frame.f_code.co_name == "__init__":
+            frame = frame.f_back
+            current_method_name = frame.f_code.co_name
+        # get the name of the caller method
         self.node = RobotFlow.get_node(current_method_name)
         self.nodes = RobotFlow.nodes
         self.robot = args[0]  # kwargs.get("robot")
+        self.robot.exception = self
         self.message = kwargs.get("message", None)
         self.next_action = kwargs.get("next_action", None)
         Exception.__init__(self, self.message)
-        self.process_exception()
+
 
     def process_exception(self):
         return
@@ -52,7 +56,7 @@ class RobotException(Exception):
         """
         retry_times = self.count_retry_times()
         if retry_times <= max_retry_times:
-            self.node.run(self.robot)
+            self.robot.node = self.node
         else:
             raise RecursionError(f"Max retry times reached for node: {self.node.name}")
 
@@ -67,7 +71,7 @@ class RobotException(Exception):
         next_node = self.get_next_node(next_node)
         retry_times = self.count_retry_times()
         if retry_times <= max_retry_times:
-            next_node.run(self.robot)
+            self.robot.node = next_node
         else:
             raise RecursionError(f"Max retry times reached for node: {self.node.name}")
 
@@ -79,7 +83,7 @@ class RobotException(Exception):
         """
         retry_times = self.count_retry_times()
         if retry_times <= max_retry_times:
-            self.nodes[0].run(self.robot)
+            self.robot.node = self.nodes[0]
         else:
             raise RecursionError(f"Max retry times reached for node: {self.node.name}")
 
@@ -87,13 +91,20 @@ class RobotException(Exception):
         """
         skip the current node
         """
-        self.node.next_node.run(self.robot)
+        args = self.robot.args
+        if args:
+            self.robot.node = self.node.get_next(*args)
+        else:
+            self.robot.node = self.node.get_next()
+
+
 
     def stop(self):
         """
         stop the current node
         """
-        self.nodes[-1].run(self.robot)
+        self.robot.node = self.nodes[-1]
+
 
     @staticmethod
     def count_retry_times(counter=[0]):

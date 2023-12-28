@@ -20,7 +20,7 @@ class System:
     def Invoke(file):
         """Execute python file"""
 
-        os.system('python ' + file)
+        os.system('python3 ' + file)
 
     @staticmethod
     def id_generator(size=6):
