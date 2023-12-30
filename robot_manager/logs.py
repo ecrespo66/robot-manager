@@ -1,5 +1,14 @@
-import logging
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Log:
     """
@@ -32,7 +41,7 @@ class Log:
             log_type = 'debug'
             self.send(log, log_type=log_type)
         else:
-            logging.debug(log)
+            print(f"{bcolors.OKBLUE}{log}{bcolors.ENDC}")
 
     def trace(self, log: str):
         """
@@ -46,7 +55,8 @@ class Log:
             log_type = 'trace'
             self.send(log, log_type=log_type)
         else:
-            logging.info(log)
+            print(f"{bcolors.OKGREEN}{log}{bcolors.ENDC}")
+
 
     def log(self, log: str):
         """
@@ -60,7 +70,7 @@ class Log:
             log_type = 'log'
             self.send(log, log_type=log_type)
         else:
-            logging.log(log)
+            print(f"{bcolors.FAIL}{log}{bcolors.ENDC}")
 
     def system_exception(self, error: str):
         """
@@ -72,7 +82,7 @@ class Log:
             log_type = 'syex'
             self.send(error, log_type=log_type)
         else:
-            logging.critical(error)
+            print(f"{bcolors.OKCYAN}{error}{bcolors.ENDC}")
 
     def business_exception(self, error: str):
         """
@@ -84,7 +94,7 @@ class Log:
             log_type = 'byex'
             self.send(error, log_type=log_type)
         else:
-            logging.exception(error)
+            print(f"{bcolors.FAIL}{error}{bcolors.ENDC}")
 
     def send(self, log: str, log_type: str):
         """
